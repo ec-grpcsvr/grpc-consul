@@ -15,7 +15,7 @@ type consulResolver struct {
 	Addr         string
 	Token        string
 	ServiceName  string
-	consulClient *consul.Client
+	consulClient *api.Client
 	lastIndex    uint64
 	addrs        []string
 	quit         chan bool
@@ -67,7 +67,7 @@ func (this *consulResolver) watcher() {
 	this.quit <- true
 }
 
-func (this *consulResolver) ResolveNow(opt resolver.ResolveNowOption) {
+func (this *consulResolver) ResolveNow(opt resolver.ResolveNowOptions) {
 	//fmt.Println("ResolveNow")
 }
 

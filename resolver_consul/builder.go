@@ -21,10 +21,10 @@ func NewBuilder() resolver.Builder {
 	return &consulBuilder{}
 }
 
-func (consulBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOption) (resolver.Resolver, error) {
-	token := target.Authority
+func (consulBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
+	token := target.Endpoint()
 
-	arr := strings.Split(target.Endpoint, "?")
+	arr := strings.Split(token, "?")
 	if len(arr) != 2 {
 		return nil, fmt.Errorf("target error, consul://token/ip:port?servieName")
 	}
