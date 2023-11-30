@@ -4,11 +4,10 @@ import (
 	"strings"
 
 	"fmt"
-
 	"google.golang.org/grpc/resolver"
 )
 
-//consul://token/ip:port?serviceName
+// consul://token/ip:port?serviceName
 const name = "consul"
 
 type consulBuilder struct {

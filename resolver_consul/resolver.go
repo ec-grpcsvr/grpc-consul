@@ -1,14 +1,13 @@
 package resolver_consul
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"strings"
-
-	consul "github.com/hashicorp/consul/api"
-	"golang.org/x/net/context"
+	"github.com/hashicorp/consul/api"
 	"google.golang.org/grpc/resolver"
+	"strings"
 )
 
 type consulResolver struct {
@@ -24,12 +23,12 @@ type consulResolver struct {
 }
 
 func (this *consulResolver) init() error {
-	conf := &consul.Config{
+	conf := &api.Config{
 		Scheme:  "http",
 		Address: this.Addr,
 	}
 
-	client, err := consul.NewClient(conf)
+	client, err := api.NewClient(conf)
 	if err != nil {
 		return fmt.Errorf("wonaming: creat consul error: %v", err)
 	}
@@ -52,7 +51,7 @@ func (this *consulResolver) watcher() {
 	this.cancelFunc = cancel
 
 	for {
-		opt := &consul.QueryOptions{AllowStale: false, WaitIndex: this.lastIndex}
+		opt := &api.QueryOptions{AllowStale: false, WaitIndex: this.lastIndex}
 		serviceEntry, err := this.queryConsul(opt.WithContext(ctx))
 		if err != nil {
 			if strings.Contains(err.Error(), context.Canceled.Error()) {
@@ -79,7 +78,7 @@ func (this *consulResolver) Close() {
 	}
 }
 
-func (this *consulResolver) queryConsul(q *consul.QueryOptions) ([]*consul.ServiceEntry, error) {
+func (this *consulResolver) queryConsul(q *api.QueryOptions) ([]*api.ServiceEntry, error) {
 	serviceEntry, meta, err := this.consulClient.Health().Service(this.ServiceName, "", true, q)
 	if err != nil {
 		return nil, err
@@ -90,12 +89,12 @@ func (this *consulResolver) queryConsul(q *consul.QueryOptions) ([]*consul.Servi
 	return serviceEntry, nil
 }
 
-func (this *consulResolver) updateAddrs(serviceEntry []*consul.ServiceEntry) {
+func (this *consulResolver) updateAddrs(serviceEntry []*api.ServiceEntry) {
 	//data, _ := json.Marshal(serviceEntry)
 	//fmt.Println("ServiceEntry:", string(data))
 	addrs := []string{}
 	for _, se := range serviceEntry {
-		if se.Checks.AggregatedStatus() == consul.HealthPassing {
+		if se.Checks.AggregatedStatus() == api.HealthPassing {
 			addrs = append(addrs, se.Service.Address+":"+fmt.Sprint(se.Service.Port))
 		}
 	}
